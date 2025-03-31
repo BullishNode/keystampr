@@ -7,7 +7,7 @@ A Rust API server that integrates Nostr message signing with Bitcoin block hashe
 ## Features
 
 - Sign messages with Nostr private keys
-- Fetch Bitcoin block hashes directly from Bitcoin Core
+- Fetch Bitcoin block hashes from mempool.space API
 - Create OpenTimestamps attestations (NIP-03 compliant)
 - Verify signed messages and timestamps
 - Look up Nostr profile information
@@ -18,7 +18,6 @@ A Rust API server that integrates Nostr message signing with Bitcoin block hashe
 - Rust 1.70 or later
 - Docker and Docker Compose
 - A Nostr private key
-- Access to a Bitcoin Core node
 
 ## Setup
 
@@ -32,9 +31,7 @@ A Rust API server that integrates Nostr message signing with Bitcoin block hashe
    ```bash
    cp .env.example .env
    ```
-   Edit `.env` and add:
-   - Your Nostr private key
-   - Your Bitcoin Core RPC URL (default: http://localhost:8332)
+   Edit `.env` and add your Nostr private key.
 
 3. Build and run with Docker:
    ```bash
