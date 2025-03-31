@@ -2,12 +2,12 @@
 
 ⚠️ **WARNING: 100% vibecoded. Do not use** ⚠️
 
-A Rust API server that integrates Nostr message signing with Bitcoin block hashes and OpenTimestamps for message timestamping. This is a CypherApp that runs within the CypherNode Docker network.
+A Rust API server that integrates Nostr message signing with Bitcoin block hashes and OpenTimestamps for message timestamping.
 
 ## Features
 
 - Sign messages with Nostr private keys
-- Fetch Bitcoin block hashes from CypherNode
+- Fetch Bitcoin block hashes directly from Bitcoin Core
 - Create OpenTimestamps attestations (NIP-03 compliant)
 - Verify signed messages and timestamps
 - Look up Nostr profile information
@@ -18,7 +18,7 @@ A Rust API server that integrates Nostr message signing with Bitcoin block hashe
 - Rust 1.70 or later
 - Docker and Docker Compose
 - A Nostr private key
-- A running CypherNode instance
+- Access to a Bitcoin Core node
 
 ## Setup
 
@@ -32,11 +32,11 @@ A Rust API server that integrates Nostr message signing with Bitcoin block hashe
    ```bash
    cp .env.example .env
    ```
-   Edit `.env` and add your Nostr private key.
+   Edit `.env` and add:
+   - Your Nostr private key
+   - Your Bitcoin Core RPC URL (default: http://localhost:8332)
 
-3. Make sure your CypherNode instance is running and accessible.
-
-4. Build and run with Docker:
+3. Build and run with Docker:
    ```bash
    docker-compose up --build
    ```

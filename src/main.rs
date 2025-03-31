@@ -97,42 +97,55 @@ struct AppState {
 
 async fn get_latest_block_hash() -> Result<String, AppError> {
     let client = reqwest::Client::new();
-    let api_url = env::var("CYPHERNODE_API_URL")
-        .unwrap_or_else(|_| "http://proxy:8000".to_string());
+    let bitcoin_rpc_url = env::var("BITCOIN_RPC_URL")
+        .unwrap_or_else(|_| "http://localhost:8332".to_string());
     
-    // Using CypherNode's internal API endpoint for latest block
     let response = client
-        .get(format!("{}/getbestblockhash", api_url))
+        .post(&bitcoin_rpc_url)
+        .json(&serde_json::json!({
+            "jsonrpc": "1.0",
+            "id": "getbestblockhash",
+            "method": "getbestblockhash",
+            "params": []
+        }))
         .send()
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
     
-    let block_hash: String = response
+    let result: serde_json::Value = response
         .json()
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
     
-    Ok(block_hash)
+    result["result"]
+        .as_str()
+        .ok_or_else(|| AppError::BlockHashError("No hash in response".to_string()))
+        .map(|s| s.to_string())
 }
 
 async fn get_block_time(block_hash: &str) -> Result<DateTime<Utc>, AppError> {
     let client = reqwest::Client::new();
-    let api_url = env::var("CYPHERNODE_API_URL")
-        .unwrap_or_else(|_| "http://proxy:8000".to_string());
+    let bitcoin_rpc_url = env::var("BITCOIN_RPC_URL")
+        .unwrap_or_else(|_| "http://localhost:8332".to_string());
     
-    // Using CypherNode's internal API endpoint for block info
     let response = client
-        .get(format!("{}/getblock/{}", api_url, block_hash))
+        .post(&bitcoin_rpc_url)
+        .json(&serde_json::json!({
+            "jsonrpc": "1.0",
+            "id": "getblock",
+            "method": "getblock",
+            "params": [block_hash]
+        }))
         .send()
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
     
-    let block: serde_json::Value = response
+    let result: serde_json::Value = response
         .json()
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
     
-    let time = block["time"]
+    let time = result["result"]["time"]
         .as_i64()
         .ok_or_else(|| AppError::BlockHashError("No timestamp in response".to_string()))?;
     
