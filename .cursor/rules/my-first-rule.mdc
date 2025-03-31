@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+- always use functional code
+- no unnecessary code
+- no privacy leaks
+- the project is open source so should be very clean
+- security-focused
+- never any hardcoded data
