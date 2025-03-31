@@ -10,10 +10,11 @@ services:
     environment:
       - RUST_LOG=info
       - NOSTR_PRIVATE_KEY=${NOSTR_PRIVATE_KEY}
+      - CYPHERNODE_API_URL=http://proxy:8000  # Internal Docker network URL
     networks:
       - cyphernode
     depends_on:
-      - cyphernode
+      - proxy
 
 networks:
   cyphernode:

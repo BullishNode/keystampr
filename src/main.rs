@@ -97,27 +97,32 @@ struct AppState {
 
 async fn get_latest_block_hash() -> Result<String, AppError> {
     let client = reqwest::Client::new();
+    let api_url = env::var("CYPHERNODE_API_URL")
+        .unwrap_or_else(|_| "http://proxy:8000".to_string());
+    
+    // Using CypherNode's internal API endpoint for latest block
     let response = client
-        .get("https://cyphernode.com/api/v1/bitcoin/blocks/latest")
+        .get(format!("{}/getbestblockhash", api_url))
         .send()
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
     
-    let block: serde_json::Value = response
+    let block_hash: String = response
         .json()
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
     
-    block["hash"]
-        .as_str()
-        .ok_or_else(|| AppError::BlockHashError("No hash in response".to_string()))
-        .map(|s| s.to_string())
+    Ok(block_hash)
 }
 
 async fn get_block_time(block_hash: &str) -> Result<DateTime<Utc>, AppError> {
     let client = reqwest::Client::new();
+    let api_url = env::var("CYPHERNODE_API_URL")
+        .unwrap_or_else(|_| "http://proxy:8000".to_string());
+    
+    // Using CypherNode's internal API endpoint for block info
     let response = client
-        .get(format!("https://cyphernode.com/api/v1/bitcoin/blocks/{}", block_hash))
+        .get(format!("{}/getblock/{}", api_url, block_hash))
         .send()
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
@@ -127,11 +132,11 @@ async fn get_block_time(block_hash: &str) -> Result<DateTime<Utc>, AppError> {
         .await
         .map_err(|e| AppError::BlockHashError(e.to_string()))?;
     
-    let time = block["timestamp"]
+    let time = block["time"]
         .as_i64()
         .ok_or_else(|| AppError::BlockHashError("No timestamp in response".to_string()))?;
     
-    Ok(DateTime::from_timestamp(time as i64, 0)
+    Ok(DateTime::from_timestamp(time, 0)
         .ok_or_else(|| AppError::BlockHashError("Invalid timestamp".to_string()))?)
 }
 
